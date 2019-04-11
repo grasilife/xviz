@@ -20,7 +20,7 @@ const Scenario = {
   ...ScenarioStraight
 };
 
-function loadScenario(name, isLive, duration) {
+function loadScenario(name, isLive, duration, rateHz) {
   // Construct proper scenario for live vs log
   const scenarioName = isLive ? name : name + '_log';
 
@@ -35,11 +35,12 @@ function loadScenario(name, isLive, duration) {
     timing: []
   };
 
-  const hz = 10;
-  const frameLimit = duration * hz;
+  const frameLimit = duration * rateHz;
+  const frameLength = 1.0 / rateHz;
 
   for (let i = 0; i < frameLimit; i++) {
-    const frame = scenario.generator.getFrame(i);
+    const timeOffset = frameLength * i;
+    const frame = scenario.generator.getFrame(timeOffset);
     data.timing.push(frame.data.updates[0].timestamp);
     data.frames.push(JSON.stringify(frame));
   }

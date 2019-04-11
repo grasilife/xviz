@@ -714,7 +714,7 @@ module.exports = function main(args) {
   }
 
   const frames = runScenario
-    ? loadScenario(args.scenario, args.live, args.duration)
+    ? loadScenario(args.scenario, args.live, args.duration, 1000 / args.delay)
     : loadFrames(args.data_directory);
 
   if (frames.frames.length === 0) {

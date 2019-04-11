@@ -18,8 +18,8 @@
  * - stream metadata for coordinate & styling
  */
 
+const ROTATIONS_PER_SECOND = 10;
 const DEG_1_AS_RAD = Math.PI / 180;
-const DEG_6_AS_RAD = 6 * DEG_1_AS_RAD;
 const DEG_90_AS_RAD = 90 * DEG_1_AS_RAD;
 
 const circle_metadata = {
@@ -58,7 +58,7 @@ const circle_metadata = {
 const circle_log_metadata = JSON.parse(JSON.stringify(circle_metadata));
 circle_log_metadata.data.log_info = {
   log_start_time: 1000,
-  log_end_time: 1030
+  log_end_time: 6000
 };
 
 class CircleScenario {
@@ -67,12 +67,12 @@ class CircleScenario {
     this.timestamp = ts || Date.now() * 1000;
   }
 
-  getFrame(frameNumber) {
-    return this._getFrame(frameNumber);
+  getFrame(timeOffset) {
+    return this._getFrame(timeOffset);
   }
 
-  _getFrame(frameNumber) {
-    const timestamp = this.timestamp + 0.1 * frameNumber;
+  _getFrame(timeOffset) {
+    const timestamp = this.timestamp + timeOffset;
 
     return {
       type: 'xviz/state_update',
@@ -81,7 +81,7 @@ class CircleScenario {
         updates: [
           {
             timestamp,
-            poses: this._drawPose(frameNumber, timestamp),
+            poses: this._drawPose(timestamp),
             primitives: this._drawGrid()
           }
         ]
@@ -89,15 +89,17 @@ class CircleScenario {
     };
   }
 
-  _drawPose(frameNumber, timestamp) {
-    // 6 degrees per frame
+  _drawPose(timestamp) {
+    const degreesPerSecond = 360 / ROTATIONS_PER_SECOND;
+    const currentDegrees = timestamp * degreesPerSecond;
+    const angle = currentDegrees * DEG_1_AS_RAD;
 
-    const angle = frameNumber * 6 * DEG_1_AS_RAD;
+    // console.log(`${degreesPerSecond} Time: ${timestamp} => ${currentDegrees} => Angle: ${angle}`);
     return {
       '/vehicle_pose': {
         timestamp,
         // Make the car orient the the proper direction on the circle
-        orientation: [0, 0, DEG_90_AS_RAD + frameNumber * DEG_6_AS_RAD],
+        orientation: [0, 0, DEG_90_AS_RAD + currentDegrees * DEG_1_AS_RAD],
         position: [30 * Math.cos(angle), 30 * Math.sin(angle), 0]
       }
     };

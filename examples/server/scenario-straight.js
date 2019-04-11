@@ -43,12 +43,12 @@ class StraightScenario {
     this.lineGap = 5;
   }
 
-  getFrame(frameNumber) {
-    return this._getFrame(frameNumber);
+  getFrame(frameNumber, frameLength) {
+    return this._getFrame(frameNumber, frameLength);
   }
 
-  _getFrame(frameNumber) {
-    const timestamp = this.timestamp + 0.1 * frameNumber;
+  _getFrame(frameNumber, frameLength) {
+    const timestamp = this.timestamp + frameLength * frameNumber;
 
     return {
       type: 'xviz/state_update',
